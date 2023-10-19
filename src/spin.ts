@@ -1,74 +1,17 @@
-const axios = require('axios');
 const logger = require('node-color-log');
 
-const { BASE_URL, TIMES_TO_SPIN } = require('./config');
-const { getWin, getTotalWin, getBalance } = require('./utils');
-const startSession = require('./startSession');
-const headers = require('./headers');
-
-const gameValues = {
-  index: 1,
-  counter: 1,
-  balance: 0,
-};
-
-const incrementGameValues = () => {
-  gameValues.index += 1;
-  gameValues.counter += 2;
-};
+const { TIMES_TO_SPIN } = require('./config');
+const { gameState } = require('./gameState');
+const startSession = require('./gameFunctions');
 
 (async () => {
-  const sessionKey = await startSession();
-  logger.success(`Started new session: ${sessionKey}`);
-
-  const setBalance = async (data: string) => {
-    const balance = getBalance(data);
-    gameValues.balance = balance;
-  };
-
-  const loadGame = async () => {
-    const { data } = await axios.post(
-      BASE_URL,
-      `action=doInit&symbol=vswaysraghex&cver=150039&index=1&counter=1&repeat=0&mgckey=${sessionKey}`,
-      {
-        headers,
-      },
-    );
-    setBalance(data);
-  };
-
-  const spin = async () => {
-    incrementGameValues();
-    const { data } = await axios.post(
-      BASE_URL,
-      `action=doSpin&symbol=vswaysraghex&c=0.1&l=20&bl=0&index=${gameValues.index}&counter=${gameValues.counter}&repeat=0&mgckey=${sessionKey}`,
-      {
-        headers,
-      },
-    );
-
-    setBalance(data);
-
-    return {
-      isFreeSpinsCompleted: data.includes('fs_total='),
-      isFreeSpin: data.includes('fsmax'),
-      win: getWin(data),
-      totalWin: getTotalWin(data),
-    };
-  };
-
-  const collect = () => {
-    incrementGameValues();
-    return axios.post(
-      BASE_URL,
-      `symbol=vswaysraghex&action=doCollect&index=${gameValues.index}&counter=${gameValues.counter}&repeat=0&mgckey=${sessionKey}`,
-      {
-        headers,
-      },
-    );
-  };
+  const { loadGame, spin, collect } = await startSession();
 
   await loadGame();
+
+  setInterval(() => {
+    console.log(`Current Balance - $${gameState.balance}`);
+  }, 60000);
 
   for (let i = 0; i < TIMES_TO_SPIN; i++) {
     const { isFreeSpinsCompleted, isFreeSpin, win, totalWin } = await spin();
