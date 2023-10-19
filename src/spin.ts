@@ -10,7 +10,7 @@ const startSession = require('./startSession');
   await loadGame();
 
   setInterval(() => {
-    console.log(`Current Balance - $${gameState.balance}`);
+    logger.info(`Current Balance - $${gameState.balance}`);
   }, 60000);
 
   for (let i = 0; i < TIMES_TO_SPIN; i++) {
@@ -26,7 +26,8 @@ const startSession = require('./startSession');
 
     if (win > 0 && !isFreeSpin) {
       await collect();
-      logger.success(`Collected - $${win.toFixed(2)}`);
+      logger.info(`Collected - $${win.toFixed(2)}`);
     }
   }
+  process.exit();
 })();
