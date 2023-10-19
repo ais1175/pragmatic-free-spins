@@ -2,13 +2,14 @@ const axios = require('axios');
 const logger = require('node-color-log');
 
 const { BASE_URL, TIMES_TO_SPIN } = require('./config');
-const { getWin, getTotalWin } = require('./utils');
+const { getWin, getTotalWin, getBalance } = require('./utils');
 const startSession = require('./startSession');
 const headers = require('./headers');
 
 const gameValues = {
   index: 1,
   counter: 1,
+  balance: 0,
 };
 
 const incrementGameValues = () => {
@@ -20,14 +21,20 @@ const incrementGameValues = () => {
   const sessionKey = await startSession();
   logger.success(`Started new session: ${sessionKey}`);
 
+  const setBalance = async (data: string) => {
+    const balance = getBalance(data);
+    gameValues.balance = balance;
+  };
+
   const loadGame = async () => {
-    return axios.post(
+    const { data } = await axios.post(
       BASE_URL,
       `action=doInit&symbol=vswaysraghex&cver=150039&index=1&counter=1&repeat=0&mgckey=${sessionKey}`,
       {
         headers,
       },
     );
+    setBalance(data);
   };
 
   const spin = async () => {
@@ -39,6 +46,8 @@ const incrementGameValues = () => {
         headers,
       },
     );
+
+    setBalance(data);
 
     return {
       isFreeSpinsCompleted: data.includes('fs_total='),
@@ -67,13 +76,14 @@ const incrementGameValues = () => {
     if (isFreeSpinsCompleted) {
       logger.info(`Free Spins - Won $${totalWin}`);
       await collect();
-    } else {
-      logger.info(`Spin ${i + 1} - $${win.toFixed(2)}`);
+      continue;
+    }
 
-      if (win > 0 && !isFreeSpin) {
-        await collect();
-        logger.success(`Collected - $${win.toFixed(2)}`);
-      }
+    logger.info(`Spin ${i + 1} - $${win.toFixed(2)}`);
+
+    if (win > 0 && !isFreeSpin) {
+      await collect();
+      logger.success(`Collected - $${win.toFixed(2)}`);
     }
   }
 })();
