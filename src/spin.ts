@@ -1,11 +1,10 @@
 const axios = require('axios');
 const logger = require('node-color-log');
 
+const { BASE_URL, TIMES_TO_SPIN } = require('./config');
+const { getWin, getTotalWin } = require('./utils');
 const startSession = require('./startSession');
 const headers = require('./headers');
-const { getWin, getTotalWin } = require('./utils');
-
-const URL = 'https://demogamesfree.pragmaticplay.net/gs2c/ge/v4/gameService';
 
 const gameValues = {
   index: 1,
@@ -23,7 +22,7 @@ const incrementGameValues = () => {
 
   const loadGame = async () => {
     return axios.post(
-      URL,
+      BASE_URL,
       `action=doInit&symbol=vswaysraghex&cver=150039&index=1&counter=1&repeat=0&mgckey=${sessionKey}`,
       {
         headers,
@@ -34,7 +33,7 @@ const incrementGameValues = () => {
   const spin = async () => {
     incrementGameValues();
     const { data } = await axios.post(
-      URL,
+      BASE_URL,
       `action=doSpin&symbol=vswaysraghex&c=0.1&l=20&bl=0&index=${gameValues.index}&counter=${gameValues.counter}&repeat=0&mgckey=${sessionKey}`,
       {
         headers,
@@ -52,7 +51,7 @@ const incrementGameValues = () => {
   const collect = () => {
     incrementGameValues();
     return axios.post(
-      URL,
+      BASE_URL,
       `symbol=vswaysraghex&action=doCollect&index=${gameValues.index}&counter=${gameValues.counter}&repeat=0&mgckey=${sessionKey}`,
       {
         headers,
@@ -62,7 +61,7 @@ const incrementGameValues = () => {
 
   await loadGame();
 
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < TIMES_TO_SPIN; i++) {
     const { isFreeSpinsCompleted, isFreeSpin, win, totalWin } = await spin();
 
     if (isFreeSpinsCompleted) {
