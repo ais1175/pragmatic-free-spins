@@ -11,7 +11,7 @@ const getTotalWin = (data: string): number => {
   throw new Error('Could not find total win');
 };
 
-const getBalance = (data: string): number => {
+const getNewBalance = (data: string): number => {
   const regex = /balance=([^&]+)/;
   const matched = data.match(regex);
   if (matched) {
@@ -23,5 +23,5 @@ const getBalance = (data: string): number => {
 module.exports = {
   getWin,
   getTotalWin,
-  getBalance,
+  getNewBalance,
 };
