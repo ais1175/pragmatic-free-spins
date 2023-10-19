@@ -2,7 +2,7 @@ const logger = require('node-color-log');
 
 const { TIMES_TO_SPIN } = require('./config');
 const { gameState } = require('./gameState');
-const startSession = require('./gameFunctions');
+const startSession = require('./startSession');
 
 (async () => {
   const { loadGame, spin, collect } = await startSession();
