@@ -1,4 +1,4 @@
-const { getBalance } = require('./utils');
+const { getNewBalance } = require('./utils');
 
 const gameState = {
   index: 1,
@@ -7,7 +7,7 @@ const gameState = {
 };
 
 const setBalance = async (data: string) => {
-  const balance = getBalance(data);
+  const balance = getNewBalance(data);
   gameState.balance = balance;
 };
 
