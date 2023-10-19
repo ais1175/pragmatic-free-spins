@@ -3,11 +3,11 @@ const logger = require('node-color-log');
 const headers = require('./headers');
 const { setBalance, incrementGame, gameState } = require('./gameState');
 const { getWin, getTotalWin } = require('./utils');
-const { BASE_URL } = require('./config');
+const { BASE_URL, GAME_SYMBOL } = require('./config');
 
 module.exports = async () => {
   const url =
-    'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=vswaysraghex&websiteUrl=https%3A%2F%2Fdemogamesfree.pragmaticplay.net&jurisdiction=99&lobby_url=https%3A%2F%2Fwww.pragmaticplay.com%2Fen%2F&lang=EN&cur=CAD';
+    `https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=${GAME_SYMBOL}&websiteUrl=https%3A%2F%2Fdemogamesfree.pragmaticplay.net&jurisdiction=99&lobby_url=https%3A%2F%2Fwww.pragmaticplay.com%2Fen%2F&lang=EN&cur=CAD`;
 
   const { request } = await axios.get(url, {
     headers: {
@@ -35,7 +35,7 @@ module.exports = async () => {
   const loadGame = async () => {
     const { data } = await axios.post(
       BASE_URL,
-      `action=doInit&symbol=vswaysraghex&cver=150039&index=1&counter=1&repeat=0&mgckey=${sessionKey}`,
+      `action=doInit&symbol=${GAME_SYMBOL}&cver=150039&index=1&counter=1&repeat=0&mgckey=${sessionKey}`,
       {
         headers,
       },
@@ -47,7 +47,7 @@ module.exports = async () => {
     incrementGame();
     const { data } = await axios.post(
       BASE_URL,
-      `action=doSpin&symbol=vswaysraghex&c=0.1&l=20&bl=0&index=${gameState.index}&counter=${gameState.counter}&repeat=0&mgckey=${sessionKey}`,
+      `action=doSpin&symbol=${GAME_SYMBOL}&c=0.1&l=20&bl=0&index=${gameState.index}&counter=${gameState.counter}&repeat=0&mgckey=${sessionKey}`,
       {
         headers,
       },
@@ -67,7 +67,7 @@ module.exports = async () => {
     incrementGame();
     return axios.post(
       BASE_URL,
-      `symbol=vswaysraghex&action=doCollect&index=${gameState.index}&counter=${gameState.counter}&repeat=0&mgckey=${sessionKey}`,
+      `symbol=${GAME_SYMBOL}&action=doCollect&index=${gameState.index}&counter=${gameState.counter}&repeat=0&mgckey=${sessionKey}`,
       {
         headers,
       },
